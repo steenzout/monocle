@@ -20,5 +20,5 @@ def hello_http(req):
     headers.add('Set-Cookie', 'test1=blar; Path=/')
     yield Return(200, headers, content)
 
-add_service(HttpServer(hello_http, 8088))
+add_service(HttpServer(8088, handler=hello_http))
 eventloop.run()

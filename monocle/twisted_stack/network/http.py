@@ -7,7 +7,7 @@ import logging
 
 from monocle import _o, Return, VERSION, launch, log_exception
 from monocle.callback import Callback
-from monocle.stack.network.http import HttpHeaders, HttpResponse, write_request, read_response, extract_response
+from monocle.stack.network.http import HttpHeaders, HttpResponse, HttpRouter, write_request, read_response, extract_response
 from monocle.twisted_stack.eventloop import reactor
 from monocle.twisted_stack.network import Service, SSLService, Client, SSLClient
 
@@ -30,7 +30,7 @@ class _HttpServerResource(resource.Resource):
         @_o
         def _handler(request):
             try:
-                value = yield launch(self.handler, request)
+                value = yield self.handler(request)
                 code, headers, content = extract_response(value)
             except Exception:
                 log_exception()
@@ -63,20 +63,24 @@ class _HttpServerResource(resource.Resource):
         return server.NOT_DONE_YET
 
 
-class HttpServer(Service):
-    def __init__(self, handler, port, bindaddr="", backlog=128):
-        self.factory = server.Site(_HttpServerResource(handler))
+class HttpServer(Service, HttpRouter):
+    def __init__(self, port, handler=None, bindaddr="", backlog=128):
+        HttpRouter.__init__(self)
         self.port = port
+        self.handler = handler
         self.bindaddr = bindaddr
         self.backlog = backlog
         self._twisted_listening_port = None
+        self.factory = server.Site(_HttpServerResource(self.handle_request))
 
 
-class HttpsServer(SSLService):
-    def __init__(self, handler, ssl_options, port, bindaddr="", backlog=128):
-        self.factory = server.Site(_HttpServerResource(handler))
+class HttpsServer(SSLService, HttpRouter):
+    def __init__(self, port, ssl_options, handler=None, bindaddr="", backlog=128):
+        HttpRouter.__init__(self)
+        self.port = port
         self.ssl_options = ssl_options
-        self.port = port
+        self.handler = handler
         self.bindaddr = bindaddr
         self.backlog = backlog
         self._twisted_listening_port = None
+        self.factory = server.Site(_HttpServerResource(self.handle_request))

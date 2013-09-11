@@ -1,5 +1,7 @@
 import urlparse
 import collections
+import re
+import urllib2
 
 from monocle import _o, Return
 from monocle.stack.network import ConnectionLost, Client, SSLClient
@@ -282,6 +284,76 @@ def extract_response(value):
     if len(value) == 2:
         return (value[0], HttpHeaders(), value[1])
     return value
+
+
+class HttpRouter(object):
+    named_param_re = re.compile(r':([^\/\?\*\:]+)')
+
+    def __init__(self):
+        self.routes = collections.defaultdict(list)
+
+    @classmethod
+    def path_matches(cls, path, pattern):
+        m = pattern.match(path)
+        if not m:
+            return False, None
+        if not m.end() == len(path):
+            # must match the whole string
+            return False, None
+        return True, m.groupdict()
+
+    def mk_decorator(self, method, pattern):
+        if not hasattr(pattern, 'match'):
+            pattern = re.escape(pattern)
+            pattern = pattern.replace(r'\?', '?')
+            pattern = pattern.replace(r'\:', ':')
+            pattern = pattern.replace(r'\_', '_')
+            pattern = pattern.replace(r'\/', '/')
+            pattern = pattern.replace(r'\*', '.*')
+            pattern = self.named_param_re.sub(r'(?P<\1>[^/]+)', pattern)
+            pattern = re.compile("^" + pattern + "$")
+
+        def decorator(f):
+            @_o
+            def replacement(req, **kwargs):
+                resp = yield _o(f)(req, **kwargs)
+                yield Return(resp)
+            self.routes[method].append((pattern, replacement))
+            return replacement
+        return decorator
+
+    def get(self, pattern):
+        return self.mk_decorator('GET', pattern)
+
+    def post(self, pattern):
+        return self.mk_decorator('POST', pattern)
+
+    def put(self, pattern):
+        return self.mk_decorator('PUT', pattern)
+
+    def delete(self, pattern):
+        return self.mk_decorator('DELETE', pattern)
+
+    def head(self, pattern):
+        return self.mk_decorator('HEAD', pattern)
+
+    def options(self, pattern):
+        return self.mk_decorator('OPTIONS', pattern)
+
+    def patch(self, pattern):
+        return self.mk_decorator('PATCH', pattern)
+
+    @_o
+    def handle_request(self, req):
+        for pattern, handler in self.routes[req.method]:
+            match, kwargs = self.path_matches(urllib2.unquote(req.path),
+                                              pattern)
+            if match:
+                yield Return((yield handler(req, **kwargs)))
+        if self.handler:
+            resp = yield self.handler(req)
+            yield Return(resp)
+        yield Return(404, {}, "")
 
 
 import monocle
