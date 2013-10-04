@@ -38,7 +38,7 @@ HTTP server, and the other makes an HTTP request:
         resp = yield HttpClient.query('http://127.0.0.1:8088/')
         print resp.code, resp.body
 
-    add_service(HttpServer(hello_http, 8088))
+    add_service(HttpServer(8088, hello_http))
     monocle.launch(request)
     eventloop.run()
 ```
