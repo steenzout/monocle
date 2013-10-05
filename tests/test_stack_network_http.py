@@ -6,7 +6,6 @@ from monocle.stack.network import http
 
 
 class ClientServerTestCase(helper.TestCase):
-    EOL = '\r\n'
 
     def setUp(self):
         self.client = http.HttpClient()
