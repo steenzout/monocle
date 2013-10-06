@@ -4,3 +4,4 @@
 *.pid
 *.pyc
 .DS_Store
+.coverage
