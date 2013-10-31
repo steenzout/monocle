@@ -3,6 +3,8 @@ import collections
 import re
 import urllib2
 
+from functools import wraps
+
 from monocle import _o, Return
 from monocle.stack.network import ConnectionLost, Client, SSLClient
 
@@ -315,6 +317,7 @@ class HttpRouter(object):
 
         def decorator(f):
             @_o
+            @wraps(f)
             def replacement(req, **kwargs):
                 resp = yield _o(f)(req, **kwargs)
                 yield Return(resp)
