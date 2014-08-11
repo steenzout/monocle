@@ -322,6 +322,8 @@ class HttpRouter(object):
                 resp = yield _o(f)(req, **kwargs)
                 yield Return(resp)
             self.routes[method].append((pattern, replacement))
+            if method == 'GET':
+                self.routes['HEAD'].append((pattern, replacement))
             return replacement
         return decorator
 
