@@ -304,7 +304,7 @@ class HttpRouter(object):
             return False, None
         return True, m.groupdict()
 
-    def mk_decorator(self, method, pattern):
+    def mk_decorator(self, method, pattern, add_head=False):
         if not hasattr(pattern, 'match'):
             pattern = re.escape(pattern)
             pattern = pattern.replace(r'\?', '?')
@@ -322,13 +322,13 @@ class HttpRouter(object):
                 resp = yield _o(f)(req, **kwargs)
                 yield Return(resp)
             self.routes[method].append((pattern, replacement))
-            if method == 'GET':
+            if add_head:
                 self.routes['HEAD'].append((pattern, replacement))
             return replacement
         return decorator
 
-    def get(self, pattern):
-        return self.mk_decorator('GET', pattern)
+    def get(self, pattern, add_head=True):
+        return self.mk_decorator('GET', pattern, add_head=add_head)
 
     def post(self, pattern):
         return self.mk_decorator('POST', pattern)
