@@ -46,7 +46,7 @@ class HttpHeaders(collections.MutableMapping):
         return (x for x in self.headers)
 
     def __repr__(self):
-        return "<HttpHeaders %s>" % repr(self.headers)
+        return "<%s %s>" % (self.__class__.__name__, repr(self.headers))
 
     def get_list(self, key):
         key = key.lower()
@@ -99,10 +99,15 @@ class HttpRequest(object):
         if not "authorization" in self.headers:
             return None, None
         auth = self.headers["authorization"]
-        method, b64 = auth.split(" ")
-        if method.lower() != "basic":
+        try:
+            method, b64 = auth.split(" ")
+            if method.lower() != "basic":
+                return None, None
+            username, password = base64.decodestring(b64).split(':', 1)
+        except Exception:
+            # parsing error; no valid auth
             return None, None
-        return base64.decodestring(b64).split(':', 1)
+        return username, password
 
 
 class HttpResponse(object):
