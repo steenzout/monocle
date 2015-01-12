@@ -7,7 +7,7 @@ import logging
 
 from monocle import _o, Return, VERSION, launch, log_exception
 from monocle.callback import Callback
-from monocle.stack.network.http import HttpHeaders, HttpResponse, HttpRouter, write_request, read_response, extract_response
+from monocle.stack.network.http import HttpHeaders, HttpRequest, HttpRouter, write_request, read_response, extract_response
 from monocle.twisted_stack.eventloop import reactor
 from monocle.twisted_stack.network import Service, SSLService, Client, SSLClient
 
@@ -28,18 +28,33 @@ class _HttpServerResource(resource.Resource):
 
     def render(self, request):
         @_o
-        def _handler(request):
+        def _handler(twisted_request):
             try:
+                headers = HttpHeaders()
+                for k, vs in twisted_request.requestHeaders.getAllRawHeaders():
+                    for v in vs:
+                        headers.add(k, v)
+
+                request = HttpRequest(
+                    proto=twisted_request.clientproto,
+                    host=twisted_request.host,
+                    method=twisted_request.method,
+                    uri=twisted_request.uri,
+                    remote_ip=twisted_request.getClientIP(),
+                    headers=headers,
+                    body=twisted_request.content.getvalue())
+                request._twisted_request = twisted_request
+
                 value = yield self.handler(request)
                 code, headers, content = extract_response(value)
             except Exception:
                 log_exception()
                 code, headers, content = 500, {}, "500 Internal Server Error"
             try:
-                if request._disconnected:
+                if twisted_request._disconnected:
                     return
 
-                request.setResponseCode(code)
+                twisted_request.setResponseCode(code)
                 headers.setdefault('Server', 'monocle/%s' % VERSION)
                 grouped_headers = {}
                 for name, value in headers.iteritems():
@@ -48,14 +63,14 @@ class _HttpServerResource(resource.Resource):
                     else:
                         grouped_headers[name] = [value]
                 for name, value in grouped_headers.iteritems():
-                    request.responseHeaders.setRawHeaders(name, value)
-                request.write(content)
+                    twisted_request.responseHeaders.setRawHeaders(name, value)
+                twisted_request.write(content)
 
                 # close connections with a 'close' header
                 if headers.get('Connection', '').lower() == 'close':
-                    request.channel.persistent = False
+                    twisted_request.channel.persistent = False
 
-                request.finish()
+                twisted_request.finish()
             except Exception:
                 log_exception()
                 raise

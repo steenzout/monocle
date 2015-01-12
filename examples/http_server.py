@@ -1,4 +1,5 @@
 import sys
+import logging
 
 import monocle
 from monocle import _o, Return
@@ -8,17 +9,19 @@ from monocle.stack import eventloop
 from monocle.stack.network import add_service
 from monocle.stack.network.http import HttpHeaders, HttpServer
 
+root = logging.getLogger('')
+root.setLevel(logging.DEBUG)
 
 @_o
 def hello_http(req):
     content = "Hello, World!"
     headers = HttpHeaders()
-    headers.add('Content-Length', len(content))
+    headers.add('Content-Length', str(len(content)))
     headers.add('Content-Type', 'text/plain')
     headers.add('Connection', 'close')
     headers.add('Set-Cookie', 'test0=blar; Path=/')
     headers.add('Set-Cookie', 'test1=blar; Path=/')
     yield Return(200, headers, content)
 
-add_service(HttpServer(8088, handler=hello_http))
+add_service(HttpServer(8089, handler=hello_http))
 eventloop.run()

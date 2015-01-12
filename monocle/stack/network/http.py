@@ -2,11 +2,16 @@ import urlparse
 import collections
 import re
 import urllib2
+import time
+import logging
+import base64
 
 from functools import wraps
 
 from monocle import _o, Return
 from monocle.stack.network import ConnectionLost, Client, SSLClient
+
+log = logging.getLogger(__name__)
 
 
 class HttpHeaders(collections.MutableMapping):
@@ -41,13 +46,17 @@ class HttpHeaders(collections.MutableMapping):
         return (x for x in self.headers)
 
     def __repr__(self):
-        return repr(self.headers)
+        return "<HttpHeaders %s>" % repr(self.headers)
 
-    def __getitem__(self, key):
+    def get_list(self, key):
         key = key.lower()
         if not key in self.keys:
             raise KeyError(key)
         vals = [v for k, v in self.headers if k == key]
+        return vals
+
+    def __getitem__(self, key):
+        vals = self.get_list(key)
         if len(vals) == 1:
             return vals[0]
         else:
@@ -66,6 +75,34 @@ class HttpHeaders(collections.MutableMapping):
             raise KeyError(key)
         self.keys.remove(key)
         self.headers = [(k, v) for k, v in self.headers if k != key]
+
+
+class HttpRequest(object):
+    def __init__(self, proto='HTTP/1.0', host=None, method=None,
+                 uri=None, remote_ip=None, headers=None, body=None):
+        self.proto = proto
+        self.host = host
+        self.method = method
+        self.uri = uri
+        self.remote_ip = remote_ip
+        self.headers = headers
+        self.body = body
+
+        self.path, _, self.query = uri.partition('?')
+        self.arguments = urlparse.parse_qs(self.query, keep_blank_values=True)
+
+    def __repr__(self):
+        return "<%s (%s %s %s, headers=%s)>" % (
+            self.__class__.__name__, self.method, self.path, self.proto, self.headers)
+
+    def get_basic_auth(self):
+        if not "authorization" in self.headers:
+            return None, None
+        auth = self.headers["authorization"]
+        method, b64 = auth.split(" ")
+        if method.lower() != "basic":
+            return None, None
+        return base64.decodestring(b64).split(':', 1)
 
 
 class HttpResponse(object):
@@ -350,15 +387,30 @@ class HttpRouter(object):
 
     @_o
     def handle_request(self, req):
+        before = time.time()
+        resp = None
         for pattern, handler in self.routes[req.method]:
             match, kwargs = self.path_matches(urllib2.unquote(req.path),
                                               pattern)
             if match:
-                yield Return((yield handler(req, **kwargs)))
-        if self.handler:
+                resp = yield handler(req, **kwargs)
+        if self.handler and not resp:
             resp = yield self.handler(req)
-            yield Return(resp)
-        yield Return(404, {}, "")
+        if not resp:
+            resp = Return(404, {}, "")
+        after = time.time()
+
+        content_length = 0
+        if len(resp) > 2:
+            content_length = len(resp[2])
+
+        log.info("[%s] %s %s %s -> %s (%s bytes, %.0fms); %s",
+                 req.remote_ip,
+                 req.method, req.path, req.proto,
+                 resp[0], content_length, (after - before) * 1000,
+                 req.headers.get('user-agent'))
+
+        yield Return(resp)
 
 
 import monocle
