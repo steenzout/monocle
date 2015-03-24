@@ -50,6 +50,7 @@ class HttpServer(HttpRouter):
                                       host=tornado_request.host,
                                       method=tornado_request.method,
                                       uri=tornado_request.uri,
+                                      arguments=tornado_request.arguments,
                                       remote_ip=tornado_request.remote_ip,
                                       headers=headers,
                                       body=tornado_request.body)

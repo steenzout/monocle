@@ -12,16 +12,18 @@ from monocle.stack.network.http import HttpHeaders, HttpServer
 root = logging.getLogger('')
 root.setLevel(logging.DEBUG)
 
-@_o
+s = HttpServer(8089)
+
+
+@s.get("/")
+@s.post("/")
 def hello_http(req):
     content = "Hello, World!"
     headers = HttpHeaders()
-    headers.add('Content-Length', str(len(content)))
     headers.add('Content-Type', 'text/plain')
-    headers.add('Connection', 'close')
     headers.add('Set-Cookie', 'test0=blar; Path=/')
     headers.add('Set-Cookie', 'test1=blar; Path=/')
     yield Return(200, headers, content)
 
-add_service(HttpServer(8089, handler=hello_http))
+add_service(s)
 eventloop.run()

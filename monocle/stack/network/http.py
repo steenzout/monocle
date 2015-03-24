@@ -79,7 +79,7 @@ class HttpHeaders(collections.MutableMapping):
 
 class HttpRequest(object):
     def __init__(self, proto='HTTP/1.0', host=None, method=None,
-                 uri=None, remote_ip=None, headers=None, body=None):
+                 uri=None, arguments=None, remote_ip=None, headers=None, body=None):
         self.proto = proto
         self.host = host
         self.method = method
@@ -89,7 +89,8 @@ class HttpRequest(object):
         self.body = body
 
         self.path, _, self.query = uri.partition('?')
-        self.arguments = urlparse.parse_qs(self.query, keep_blank_values=True)
+        self.query_arguments = urlparse.parse_qs(self.query, keep_blank_values=True)
+        self.arguments = arguments
 
     def __repr__(self):
         return "<%s (%s %s %s, headers=%s)>" % (
@@ -402,7 +403,7 @@ class HttpRouter(object):
         if self.handler and not resp:
             resp = yield self.handler(req)
         if not resp:
-            resp = Return(404, {}, "")
+            resp = (404, {}, "")
         after = time.time()
 
         content_length = 0

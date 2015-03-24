@@ -35,11 +35,17 @@ class _HttpServerResource(resource.Resource):
                     for v in vs:
                         headers.add(k, v)
 
+                arguments = dict(
+                    [(k.decode('utf-8'), v)
+                     for k, v
+                     in twisted_request.args.iteritems()])
+
                 request = HttpRequest(
                     proto=twisted_request.clientproto,
-                    host=twisted_request.host,
+                    host=twisted_request.getRequestHostname(),
                     method=twisted_request.method,
                     uri=twisted_request.uri,
+                    arguments=arguments,
                     remote_ip=twisted_request.getClientIP(),
                     headers=headers,
                     body=twisted_request.content.getvalue())
