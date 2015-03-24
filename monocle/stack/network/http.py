@@ -5,6 +5,7 @@ import urllib2
 import time
 import logging
 import base64
+import Cookie
 
 from functools import wraps
 
@@ -91,6 +92,14 @@ class HttpRequest(object):
         self.path, _, self.query = uri.partition('?')
         self.query_arguments = urlparse.parse_qs(self.query, keep_blank_values=True)
         self.arguments = arguments
+
+        self.cookies = {}
+        for cookie in self.headers.get_list("cookie"):
+            try:
+                for name, morsel in Cookie.BaseCookie(cookie).iteritems():
+                    self.cookies[name] = morsel.value
+            except Cookie.CookieError:
+                pass
 
     def __repr__(self):
         return "<%s (%s %s %s, headers=%s)>" % (
