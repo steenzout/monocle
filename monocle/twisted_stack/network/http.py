@@ -35,6 +35,7 @@ class _HttpServerResource(resource.Resource):
                     for v in vs:
                         headers.add(k, v)
 
+                # decode UTF-8 keys, matching tornado arg parsing behavior
                 arguments = dict(
                     [(k.decode('utf-8'), v)
                      for k, v
