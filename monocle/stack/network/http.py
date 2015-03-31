@@ -15,7 +15,13 @@ from monocle.stack.network import ConnectionLost, Client, SSLClient
 log = logging.getLogger(__name__)
 
 
+# a unique value to let us check when a default was not set to anything else
+class _NotSetFlag(object):
+    pass
+
+
 class HttpHeaders(collections.MutableMapping):
+
     def __init__(self, headers=None):
         self.headers = []
         self.keys = set()
@@ -49,10 +55,13 @@ class HttpHeaders(collections.MutableMapping):
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, repr(self.headers))
 
-    def get_list(self, key):
+    def get_list(self, key, default=_NotSetFlag):
         key = key.lower()
         if not key in self.keys:
-            raise KeyError(key)
+            if default == _NotSetFlag:
+                raise KeyError(key)
+            else:
+                return default
         vals = [v for k, v in self.headers if k == key]
         return vals
 
@@ -94,7 +103,7 @@ class HttpRequest(object):
         self.arguments = arguments
 
         self.cookies = {}
-        for cookie in self.headers.get_list("cookie"):
+        for cookie in self.headers.get_list("cookie", []):
             try:
                 for name, morsel in Cookie.BaseCookie(cookie).iteritems():
                     self.cookies[name] = morsel.value
