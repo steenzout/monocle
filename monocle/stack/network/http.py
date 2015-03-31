@@ -24,7 +24,7 @@ class HttpHeaders(collections.MutableMapping):
 
     def __init__(self, headers=None):
         self.headers = []
-        self.keys = set()
+        self.keyset = set()
         if hasattr(headers, 'iteritems'):
             for k, v in headers.iteritems():
                 self.add(k, v)
@@ -40,7 +40,7 @@ class HttpHeaders(collections.MutableMapping):
 
     def add(self, key, value):
         key = key.lower()
-        self.keys.add(key)
+        self.keyset.add(key)
         self.headers.append((key, value))
 
     def items(self):
@@ -57,7 +57,7 @@ class HttpHeaders(collections.MutableMapping):
 
     def get_list(self, key, default=_NotSetFlag):
         key = key.lower()
-        if not key in self.keys:
+        if not key in self.keyset:
             if default == _NotSetFlag:
                 raise KeyError(key)
             else:
@@ -81,9 +81,9 @@ class HttpHeaders(collections.MutableMapping):
 
     def __delitem__(self, key):
         key = key.lower()
-        if not key in self.keys:
+        if not key in self.keyset:
             raise KeyError(key)
-        self.keys.remove(key)
+        self.keyset.remove(key)
         self.headers = [(k, v) for k, v in self.headers if k != key]
 
 
