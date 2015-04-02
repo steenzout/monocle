@@ -89,7 +89,7 @@ class HttpHeaders(collections.MutableMapping):
 
 class HttpRequest(object):
     def __init__(self, proto='HTTP/1.0', host=None, method=None,
-                 uri=None, arguments=None, remote_ip=None, headers=None, body=None):
+                 uri=None, args=None, remote_ip=None, headers=None, body=None):
         self.proto = proto
         self.host = host
         self.method = method
@@ -99,8 +99,8 @@ class HttpRequest(object):
         self.body = body
 
         self.path, _, self.query = uri.partition('?')
-        self.query_arguments = urlparse.parse_qs(self.query, keep_blank_values=True)
-        self.arguments = arguments
+        self.query_args = urlparse.parse_qs(self.query, keep_blank_values=True)
+        self.args = args
 
         self.cookies = {}
         for cookie in self.headers.get_list("cookie", []):

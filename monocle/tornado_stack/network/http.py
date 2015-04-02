@@ -50,7 +50,7 @@ class HttpServer(HttpRouter):
                                       host=tornado_request.host,
                                       method=tornado_request.method,
                                       uri=tornado_request.uri,
-                                      arguments=tornado_request.arguments,
+                                      args=tornado_request.arguments,
                                       remote_ip=tornado_request.remote_ip,
                                       headers=headers,
                                       body=tornado_request.body)
@@ -61,7 +61,7 @@ class HttpServer(HttpRouter):
             except:
                 code, headers, content = 500, {}, "500 Internal Server Error"
             tornado_request.write("HTTP/1.1 %s %s\r\n" %
-                          (code, responses.get(code, 'Unknown')))
+                                  (code, responses.get(code, 'Unknown')))
             headers.setdefault('Server', 'monocle/%s' % VERSION)
             headers.setdefault('Content-Length', str(len(content)))
             for name, value in headers.iteritems():

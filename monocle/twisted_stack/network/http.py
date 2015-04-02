@@ -36,7 +36,7 @@ class _HttpServerResource(resource.Resource):
                         headers.add(k, v)
 
                 # decode UTF-8 keys, matching tornado arg parsing behavior
-                arguments = dict(
+                args = dict(
                     [(k.decode('utf-8'), v)
                      for k, v
                      in twisted_request.args.iteritems()])
@@ -46,7 +46,7 @@ class _HttpServerResource(resource.Resource):
                     host=twisted_request.getRequestHostname(),
                     method=twisted_request.method,
                     uri=twisted_request.uri,
-                    arguments=arguments,
+                    args=args,
                     remote_ip=twisted_request.getClientIP(),
                     headers=headers,
                     body=twisted_request.content.getvalue())
