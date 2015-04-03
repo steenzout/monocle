@@ -2,7 +2,7 @@
 #
 # by Steven Hazel
 
-import urlparse
+import os
 import logging
 
 from monocle import _o, Return, VERSION, launch, log_exception
@@ -23,8 +23,9 @@ class HttpException(Exception): pass
 class _HttpServerResource(resource.Resource):
     isLeaf = 1
 
-    def __init__(self, handler):
+    def __init__(self, handler, max_body_str_len):
         self.handler = handler
+        self.max_body_str_len = max_body_str_len
 
     def render(self, request):
         @_o
@@ -41,6 +42,16 @@ class _HttpServerResource(resource.Resource):
                      for k, v
                      in twisted_request.args.iteritems()])
 
+                body = None
+                if hasattr(twisted_request.content, "getvalue"):
+                    body = twisted_request.content.getvalue()
+                else:
+                    twisted_request.content.seek(0, os.SEEK_END)
+                    if twisted_request.content.tell() <= self.max_body_str_len:
+                        twisted_request.content.seek(0, os.SEEK_SET)
+                        body = twisted_request.content.read()
+                        twisted_request.content.seek(0, os.SEEK_SET)
+
                 request = HttpRequest(
                     proto=twisted_request.clientproto,
                     host=twisted_request.getRequestHostname(),
@@ -49,7 +60,8 @@ class _HttpServerResource(resource.Resource):
                     args=args,
                     remote_ip=twisted_request.getClientIP(),
                     headers=headers,
-                    body=twisted_request.content.getvalue())
+                    body=body,
+                    body_file=twisted_request.content)
                 request._twisted_request = twisted_request
 
                 value = yield self.handler(request)
@@ -86,18 +98,21 @@ class _HttpServerResource(resource.Resource):
 
 
 class HttpServer(Service, HttpRouter):
-    def __init__(self, port, handler=None, bindaddr="", backlog=128):
+    def __init__(self, port, handler=None, bindaddr="", backlog=128,
+                 max_body_str_len=100 * 1024 * 1024):
         HttpRouter.__init__(self)
         self.port = port
         self.handler = handler
         self.bindaddr = bindaddr
         self.backlog = backlog
         self._twisted_listening_port = None
-        self.factory = server.Site(_HttpServerResource(self.handle_request))
+        self.factory = server.Site(_HttpServerResource(self.handle_request,
+                                                       max_body_str_len))
 
 
 class HttpsServer(SSLService, HttpRouter):
-    def __init__(self, port, ssl_options, handler=None, bindaddr="", backlog=128):
+    def __init__(self, port, ssl_options, handler=None, bindaddr="", backlog=128,
+                 max_body_str_len=100 * 1024 * 1024):
         HttpRouter.__init__(self)
         self.port = port
         self.ssl_options = ssl_options
@@ -105,4 +120,5 @@ class HttpsServer(SSLService, HttpRouter):
         self.bindaddr = bindaddr
         self.backlog = backlog
         self._twisted_listening_port = None
-        self.factory = server.Site(_HttpServerResource(self.handle_request))
+        self.factory = server.Site(_HttpServerResource(self.handle_request,
+                                                       max_body_str_len))

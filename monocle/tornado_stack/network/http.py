@@ -2,6 +2,7 @@
 #
 # by Steven Hazel
 
+import io
 import tornado.httpclient
 import tornado.httpserver
 
@@ -46,6 +47,7 @@ class HttpServer(HttpRouter):
                 for k, v in tornado_request.headers.get_all():
                     headers.add(k, v)
 
+                body_file = io.BytesIO(tornado_request.body)
                 request = HttpRequest(proto=tornado_request.version,
                                       host=tornado_request.host,
                                       method=tornado_request.method,
@@ -53,7 +55,8 @@ class HttpServer(HttpRouter):
                                       args=tornado_request.arguments,
                                       remote_ip=tornado_request.remote_ip,
                                       headers=headers,
-                                      body=tornado_request.body)
+                                      body=tornado_request.body,
+                                      body_file=body_file)
                 request._tornado_request = tornado_request
 
                 value = yield launch(self.handle_request, request)
