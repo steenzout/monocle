@@ -99,7 +99,7 @@ class _HttpServerResource(resource.Resource):
 
 class HttpServer(Service, HttpRouter):
     def __init__(self, port, handler=None, bindaddr="", backlog=128,
-                 max_body_str_len=100 * 1024 * 1024):
+                 max_body_str_len=1024 * 1024):
         HttpRouter.__init__(self)
         self.port = port
         self.handler = handler
@@ -112,7 +112,7 @@ class HttpServer(Service, HttpRouter):
 
 class HttpsServer(SSLService, HttpRouter):
     def __init__(self, port, ssl_options, handler=None, bindaddr="", backlog=128,
-                 max_body_str_len=100 * 1024 * 1024):
+                 max_body_str_len=1024 * 1024):
         HttpRouter.__init__(self)
         self.port = port
         self.ssl_options = ssl_options
