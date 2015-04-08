@@ -420,6 +420,7 @@ class HttpRouter(object):
                                               pattern)
             if match:
                 resp = yield handler(req, **kwargs)
+                break
         if self.handler and not resp:
             resp = yield self.handler(req)
         if not resp:
