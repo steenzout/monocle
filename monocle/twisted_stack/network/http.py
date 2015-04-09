@@ -50,7 +50,7 @@ class _HttpServerResource(resource.Resource):
                     if twisted_request.content.tell() <= self.max_body_str_len:
                         twisted_request.content.seek(0, os.SEEK_SET)
                         body = twisted_request.content.read()
-                        twisted_request.content.seek(0, os.SEEK_SET)
+                    twisted_request.content.seek(0, os.SEEK_SET)
 
                 request = HttpRequest(
                     proto=twisted_request.clientproto,
