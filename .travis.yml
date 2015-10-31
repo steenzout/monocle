@@ -1,25 +1,34 @@
 language: python
-python:
-  - "2.6"
-  - "2.7"
-  - "pypy"
-env:
-  - BACKEND=tornado
-  - BACKEND=twisted
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libssl-dev
-install:
-  - pip install pyOpenSSL $BACKEND --use-mirrors
-  - pip install . --use-mirrors
-  - pip install pytest
-script:
-  - python examples/basics.py $BACKEND
-  - python examples/client_server.py $BACKEND
-  - python examples/sleep.py $BACKEND
-  - python examples/tb.py $BACKEND
-  - python o_test.py -v $BACKEND tests/
+sudo: false
+branches:
+  except:
+    - gh-pages
 
 matrix:
-  exclude:
-    - python: "pypy"
+  include:
+    - python: 2.7
+      env: TOXENV=py27-tornado
+    - python: 2.7
+      env: TOXENV=py27-twisted
+    - python: 2.7
+      env: TOXENV=py27-coverage
+    - python: 2.6
+      env: TOXENV=py26-tornado
+    - python: 2.6
+      env: TOXENV=py26-twisted
+    - python: pypy
+      env: TOXENV=pypy-tornado
+
+cache:
+  - apt
+
+addons:
+  apt:
+    packages:
+      - libssl-dev
+
+install:
+  - pip install tox
+
+script:
+  - tox
