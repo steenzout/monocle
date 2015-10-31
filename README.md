@@ -2,7 +2,12 @@
 ## An async programming framework with a blocking look-alike syntax.
 
 [![pypi](https://img.shields.io/pypi/v/monocle.svg)](https://pypi.python.org/pypi/monocle/)
-[![Build Status](https://travis-ci.org/saucelabs/monocle.png?branch=master)](https://travis-ci.org/saucelabs/monocle)
+[![Build Status](https://travis-ci.org/steenzout/monocle.png?branch=master)](https://travis-ci.org/steenzout/monocle)
+[![Code Health](https://landscape.io/github/steenzout/monocle/master/landscape.svg?style=flat)](https://landscape.io/github/steenzout/monocle/master)
+[![Coverage Status](https://coveralls.io/repos/steenzout/monocle/badge.png)](https://coveralls.io/r/steenzout/monocle)
+[![Requirements Status](https://requires.io/github/steenzout/monocle/requirements.png?branch=master)](https://requires.io/github/steenzout/monocle/requirements/?branch=master)
+
+[![Project Stats](https://www.openhub.net/p/saucelabss_monocle/widgets/project_thin_badge.gif)](https://www.openhub.net/p/saucelabss_monocle/)
 
 monocle straightens out event-driven code using Python's generators.
 It aims to be portable between event-driven I/O frameworks, and
