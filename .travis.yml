@@ -12,6 +12,7 @@ before_install:
 install:
   - pip install pyOpenSSL $BACKEND --use-mirrors
   - pip install . --use-mirrors
+  - pip install pytest
 script:
   - python examples/basics.py $BACKEND
   - python examples/client_server.py $BACKEND
