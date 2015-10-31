@@ -23,4 +23,3 @@ script:
 matrix:
   exclude:
     - python: "pypy"
-      env: BACKEND=twisted
