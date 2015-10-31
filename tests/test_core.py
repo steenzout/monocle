@@ -1,19 +1,25 @@
-import helper
-
-import monocle
+from monocle import _o
 from monocle import core
 
+from o_test import test
 
-class ReturnTestCase(helper.TestCase):
 
-    def test_none(self):
-        r = core.Return()
-        self.assertEqual(r.value, None)
+@test
+@_o
+def test_none():
+    r = core.Return()
+    assert r.value is None
 
-    def test_single(self):
-        r = core.Return('ok')
-        self.assertEqual(r.value, 'ok')
 
-    def test_multi(self):
-        r = core.Return('one', 'two')
-        self.assertEqual(r.value, ('one', 'two'))
+@test
+@_o
+def test_single():
+    r = core.Return('ok')
+    assert r.value == 'ok'
+
+
+@test
+@_o
+def test_multi():
+    r = core.Return('one', 'two')
+    r.value == ('one', 'two')

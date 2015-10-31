@@ -1,48 +1,42 @@
-import helper
-
-from monocle import callback
-
-
-class TestCase(helper.TestCase):
-
-    def setUp(self):
-        self.calls = []
-
-    def call(self, result):
-        self.calls.append(result)
+import pytest
+from monocle import _o
+from monocle.callback import Callback, defer
+from o_test import test
 
 
-class CallbackTestCase(TestCase):
-
-    def setUp(self):
-        TestCase.setUp(self)
-        self.cb = callback.Callback()
-
-    def test_result(self):
-        self.assertFalse(hasattr(self.cb, 'result'))
-        self.cb('ok')
-        self.assertEqual(self.cb.result, 'ok')
-
-    def test_add(self):
-        self.assertEqual(self.cb._handlers, [])
-        self.cb.add(self.call)
-        self.assertEqual(self.cb._handlers, [self.cb])
-        self.assertRaises(TypeError, cb.add, False)
-        self.assertEqual(self.cb._handlers, [self.cb])
-        self.assertEqual(self.calls, [])
-        self.cb('ok')
-        self.assertEqual(self.calls, ['ok'])
-        cb.add(self.call)
-        self.assertEqual(self.calls, ['ok', 'ok'])
-        self.assertRaises(TypeError, cb.add, False)
+@test
+@_o
+def test_result():
+    cb = Callback()
+    assert not hasattr(cb, 'result')
+    cb('ok')
+    assert cb.result == 'ok'
 
 
-class DeferTestCase(TestCase):
+@test
+@_o
+def test_add():
+    cb = Callback()
+    calls = []
+    assert cb._handlers == []
+    cb.add(calls.append)
+    assert cb._handlers == [calls.append]
+    pytest.raises(TypeError, cb.add, False)
+    assert cb._handlers == [calls.append]
+    assert calls == []
+    cb('ok')
+    assert calls == ['ok']
+    cb.add(calls.append)
+    assert calls == ['ok', 'ok']
+    pytest.raises(TypeError, cb.add, False)
 
-    def test_callback(self):
-        cb = callback.defer('ok')
-        self.assertTrue(isinstance(cb, callback.Callback))
-        self.assertEqual(cb.result, 'ok')
-        self.assertEqual(self.calls, [])
-        cb.add(self.call)
-        self.assertEqual(self.calls, ['ok'])
+
+@test
+@_o
+def test_defer():
+    cb = defer('ok')
+    assert isinstance(cb, Callback)
+    assert cb.result == 'ok'
+    calls = []
+    cb.add(calls.append)
+    assert calls == ['ok']

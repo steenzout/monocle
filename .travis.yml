@@ -17,6 +17,7 @@ script:
   - python examples/client_server.py $BACKEND
   - python examples/sleep.py $BACKEND
   - python examples/tb.py $BACKEND
+  - python o_test.py -v $BACKEND tests/
 
 matrix:
   exclude:

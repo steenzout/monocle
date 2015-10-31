@@ -1,9 +1,12 @@
-import helper
+from o_test import test, tests
+from contextlib import contextmanager
 
 from monocle import _o
 from monocle.callback import Callback
 from monocle.stack import eventloop, network
 from monocle.util import sleep
+
+import helper
 
 EOL = '\r\n'
 
@@ -36,9 +39,10 @@ class StackConnection(object):
         self.out.append(data)
 
 
-class ConnectionTestCase(helper.TestCase):
+@tests
+class ConnectionTestCase(object):
 
-    def setUp(self):
+    def __init__(self):
         self.stack_conn = StackConnection()
         self.conn = network.Connection(stack_conn=self.stack_conn)
 
@@ -50,16 +54,16 @@ class ConnectionTestCase(helper.TestCase):
     def buffer(self, value):
         self.stack_conn.buffer = value
 
-    @helper.o
+    @_o
     def test(self):
         data = 'ok'
         self.buffer = data
         r = yield self.conn.read(2)
-        self.assertEqual(r, data)
-        self.assertEqual(self.buffer, '')
-        self.assertEqual(self.stack_conn.resume_called, 0)
+        assert r == data
+        assert self.buffer == ''
+        assert self.stack_conn.resume_called == 0
 
-    @helper.o
+    @_o
     def test_read_delay(self):
         data = 'ok'
         self.buffer = 'o'
@@ -69,11 +73,11 @@ class ConnectionTestCase(helper.TestCase):
             self.stack_conn.read_cb(None)
         eventloop.queue_task(0.1, populate)
         r = yield self.conn.read(2)
-        self.assertEqual(r, data)
-        self.assertEqual(self.stack_conn.resume_called, 1)
+        assert r == data
+        assert self.stack_conn.resume_called == 1
         yield sleep(0.2)  # ensure timeout has expired
 
-    @helper.o
+    @_o
     def test_read_timeout(self):
         self.conn.timeout = 0.1
         try:
@@ -82,18 +86,18 @@ class ConnectionTestCase(helper.TestCase):
             pass
         else:
             raise Exception('ConnectionLost should be raised')
-        self.assertEqual(self.stack_conn.resume_called, 1)
+        assert self.stack_conn.resume_called == 1
 
-    @helper.o
+    @_o
     def test_read_some(self):
         data = 'ok'
         self.buffer = data
         r = yield self.conn.read_some()
-        self.assertEqual(r, data)
-        self.assertEqual(self.buffer, '')
-        self.assertEqual(self.stack_conn.resume_called, 0)
+        assert r == data
+        assert self.buffer == ''
+        assert self.stack_conn.resume_called == 0
 
-    @helper.o
+    @_o
     def test_read_some_delay(self):
         data = 'ok'
         self.conn.timeout = 0.2
@@ -102,11 +106,11 @@ class ConnectionTestCase(helper.TestCase):
             self.stack_conn.read_cb(None)
         eventloop.queue_task(0.1, populate)
         r = yield self.conn.read_some()
-        self.assertEqual(r, data)
-        self.assertEqual(self.stack_conn.resume_called, 1)
+        assert r == data
+        assert self.stack_conn.resume_called == 1
         yield sleep(0.2)  # ensure timeout has expired
 
-    @helper.o
+    @_o
     def test_read_some_timeout(self):
         self.conn.timeout = 0.1
         try:
@@ -115,58 +119,61 @@ class ConnectionTestCase(helper.TestCase):
             pass
         else:
             raise Exception('ConnectionLost should be raised')
-        self.assertEqual(self.stack_conn.resume_called, 1)
+        assert self.stack_conn.resume_called == 1
 
-    @helper.o
+    @_o
     def test_read_util(self):
         data = 'hello.'
         self.buffer = 'hello.world'
         r = yield self.conn.read_until('.')
-        self.assertEqual(r, data)
-        self.assertEqual(self.buffer, 'world')
-        self.assertEqual(self.stack_conn.resume_called, 0)
+        assert r == data
+        assert self.buffer == 'world'
+        assert self.stack_conn.resume_called == 0
 
-    @helper.o
+    @_o
     def test_readline(self):
         data = 'hello\n'
         self.buffer = 'hello\nworld'
         r = yield self.conn.readline()
-        self.assertEqual(r, data)
-        self.assertEqual(self.buffer, 'world')
-        self.assertEqual(self.stack_conn.resume_called, 0)
+        assert r == data
+        assert self.buffer == 'world'
+        assert self.stack_conn.resume_called == 0
 
 
-class ClientServerTestCase(helper.TestCase):
-
-    def setUp(self):
-        self.client = network.Client()
-        self.service = network.Service(self.handler, bindaddr=helper.HOST, port=helper.PORT)
-        network.add_service(self.service)
-
-    def tearDown(self):
-        try:
-            self.client.close()
-        except:
-            pass
-        try:
-            self.service.stop()
-        except:
-            pass
-        helper.TestCase.tearDown(self)
-
+@contextmanager
+def network_server_running():
     @_o
-    def handler(self, conn):
+    def handler(conn):
         while True:
             try:
                 msg = yield conn.read_until(EOL)
             except network.ConnectionLost:
                 break
             yield conn.write('you said: ' + msg.strip() + EOL)
+    service = network.Service(handler, bindaddr=helper.HOST, port=helper.PORT)
+    network.add_service(service)
+    try:
+        yield
+    finally:
+        service.stop()
 
-    @helper.o
-    def test_client(self):
-        msg = 'ok'
-        yield self.client.connect(helper.HOST, helper.PORT)
-        yield self.client.write(msg + EOL)
-        result = yield self.client.read_until(EOL)
-        self.assertEqual(result, 'you said: ' + msg + EOL)
+
+@contextmanager
+def network_client():
+    client = network.Client()
+    try:
+        yield client
+    finally:
+        client.close()
+
+
+@test
+@_o
+def test_client():
+    with network_server_running():
+        with network_client() as client:
+            msg = 'ok'
+            yield client.connect(helper.HOST, helper.PORT)
+            yield client.write(msg + EOL)
+            result = yield client.read_until(EOL)
+            assert result == 'you said: ' + msg + EOL
