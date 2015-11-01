@@ -5,8 +5,6 @@ from monocle import _o, Return
 from monocle.stack import network
 from monocle.stack.network import http
 
-import helper
-
 
 @contextmanager
 def http_server_running():
@@ -18,7 +16,7 @@ def http_server_running():
         headers.add('Content-Type', 'text/plain')
         headers.add('Connection', 'close')
         yield Return(200, headers, data)
-    service = http.HttpServer(helper.PORT, handler=handler)
+    service = http.HttpServer(5556, handler=handler)
     network.add_service(service)
     try:
         yield

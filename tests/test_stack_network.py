@@ -6,8 +6,6 @@ from monocle.callback import Callback
 from monocle.stack import eventloop, network
 from monocle.util import sleep
 
-import helper
-
 EOL = '\r\n'
 
 
@@ -150,7 +148,7 @@ def network_server_running():
             except network.ConnectionLost:
                 break
             yield conn.write('you said: ' + msg.strip() + EOL)
-    service = network.Service(handler, bindaddr=helper.HOST, port=helper.PORT)
+    service = network.Service(handler, bindaddr='127.0.0.1', port=5555)
     network.add_service(service)
     try:
         yield
