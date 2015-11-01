@@ -108,10 +108,10 @@ def run(tests, verbose=False):
     print "----------------------------------------------------------------------"
     print "Ran %s tests in %.3fs" % (len(tests), duration)
     print
-    fail = False
+    fail_count = 0
     for result in results:
         if result['type'] != "SUCCESS":
-            fail = True
+            fail_count += 1
             test = result['test']
             print "======================================================================"
             print "%s %s (%s)" % (result['type'],
@@ -131,11 +131,12 @@ def run(tests, verbose=False):
                 print "-------------------- >> begin captured log << ---------------------"
                 print result['log']
                 print "--------------------- >> end captured log << ----------------------"
-    if not fail:
+    if not fail_count:
         print "OK"
 
     from monocle.stack import eventloop
     eventloop.halt()
+    sys.exit(fail_count)
 
 
 def main(args):
