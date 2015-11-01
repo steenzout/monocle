@@ -10,6 +10,7 @@ from httplib import responses
 from monocle import _o, Return, VERSION, launch
 from monocle.callback import Callback
 from monocle.stack.network.http import HttpHeaders, HttpRequest, HttpClient, HttpRouter, extract_response
+from monocle.tornado_stack.network import Service
 
 
 class HttpException(Exception): pass
@@ -33,7 +34,7 @@ class HttpClient(HttpClient):
         yield Return(response)
 
 
-class HttpServer(HttpRouter):
+class HttpServer(Service, HttpRouter):
     def __init__(self, port, handler=None):
         HttpRouter.__init__(self)
         self.handler = handler
