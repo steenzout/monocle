@@ -86,6 +86,7 @@ def tests(cls):
     for name, method in inspect.getmembers(cls, predicate=inspect.ismethod):
         if not name.startswith('test_'):
             continue
+
         @wraps(method)
         def f(name=name):
             o = cls()
@@ -197,7 +198,8 @@ def main(args):
         for test in all_tests:
             try:
                 m = __import__(test, globals(), locals())
-                imported_tests.extend(m.test.func_globals['_tests'])
+                if hasattr(m, "test"):
+                    imported_tests.extend(m.test.func_globals['_tests'])
             except Exception, e:
                 print test, str(e)
         _tests.extend(set(imported_tests))
