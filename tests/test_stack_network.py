@@ -139,7 +139,7 @@ class ConnectionTestCase(object):
 
 
 @contextmanager
-def network_server_running():
+def network_server_running(addr, port):
     @_o
     def handler(conn):
         while True:
@@ -148,7 +148,7 @@ def network_server_running():
             except network.ConnectionLost:
                 break
             yield conn.write('you said: ' + msg.strip() + EOL)
-    service = network.Service(handler, bindaddr='127.0.0.1', port=5555)
+    service = network.Service(handler, bindaddr=addr, port=port)
     network.add_service(service)
     try:
         yield
@@ -168,10 +168,12 @@ def network_client():
 @test
 @_o
 def test_client():
-    with network_server_running():
+    addr = '127.0.0.1'
+    port = 5555
+    with network_server_running(addr, port):
         with network_client() as client:
             msg = 'ok'
-            yield client.connect(helper.HOST, helper.PORT)
+            yield client.connect(addr, port)
             yield client.write(msg + EOL)
             result = yield client.read_until(EOL)
             assert result == 'you said: ' + msg + EOL

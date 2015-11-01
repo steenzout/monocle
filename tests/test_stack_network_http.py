@@ -7,7 +7,7 @@ from monocle.stack.network import http
 
 
 @contextmanager
-def http_server_running():
+def http_server_running(port):
     @_o
     def handler(conn):
         data = 'Hello, World!'
@@ -16,7 +16,7 @@ def http_server_running():
         headers.add('Content-Type', 'text/plain')
         headers.add('Connection', 'close')
         yield Return(200, headers, data)
-    service = http.HttpServer(5556, handler=handler)
+    service = http.HttpServer(port, handler=handler)
     network.add_service(service)
     try:
         yield
@@ -36,8 +36,10 @@ def http_client():
 @test
 @_o
 def test_client():
-    with http_server_running():
+    addr = '127.0.0.1'
+    port = 5556
+    with http_server_running(port):
         with http_client() as client:
-            yield client.connect(helper.HOST, helper.PORT)
+            yield client.connect(addr, port)
             r = yield client.request('/')
             assert r.code == '200'  # should this be an int?
