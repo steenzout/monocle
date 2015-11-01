@@ -25,7 +25,7 @@ def __init__(orig_method, self, *a, **k):
     self._read_some = None
 
 @monkeypatch(IOStream)
-def _read_from_buffer(orig_method, self):
+def _read_from_buffer(orig_method, self, *a, **k):
     if self._read_some is not None:
         if self._read_buffer_size > 0:
             callback = self._read_callback
@@ -34,7 +34,7 @@ def _read_from_buffer(orig_method, self):
             self._run_callback(callback, self._consume(self._read_buffer_size))
             return True
     else:
-        return orig_method(self)
+        return orig_method(self, *a, **k)
 
 @monkeypatch(IOStream)
 def read_some(orig_method, self, callback):
