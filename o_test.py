@@ -16,6 +16,7 @@ root = logging.getLogger('')
 root.setLevel(logging.DEBUG)
 
 _tests = []
+_fail_count = 1
 
 
 @_o
@@ -97,46 +98,48 @@ def tests(cls):
 
 @_o
 def run(tests, verbose=False):
-    #print tests
-    results = []
-    start_time = time.time()
-    for test in tests:
-        result = yield test(verbose)
-        results.append(result)
-    duration = time.time() - start_time
-    print
-    print "----------------------------------------------------------------------"
-    print "Ran %s tests in %.3fs" % (len(tests), duration)
-    print
-    fail_count = 0
-    for result in results:
-        if result['type'] != "SUCCESS":
-            fail_count += 1
-            test = result['test']
-            print "======================================================================"
-            print "%s %s (%s)" % (result['type'],
-                                  test.__doc__ or test.__name__,
-                                  __file__)
-            print "----------------------------------------------------------------------"
-            print result['tb']
-            if result['stdout']:
-                print "-------------------- >> begin captured stdout << ---------------------"
-                print result['stdout']
-                print "--------------------- >> end captured stdout << ----------------------"
-            if result['stderr']:
-                print "-------------------- >> begin captured stderr << ---------------------"
-                print result['stderr']
-                print "--------------------- >> end captured stderr << ----------------------"
-            if result['log']:
-                print "-------------------- >> begin captured log << ---------------------"
-                print result['log']
-                print "--------------------- >> end captured log << ----------------------"
-    if not fail_count:
-        print "OK"
+    global _fail_count
 
-    from monocle.stack import eventloop
-    eventloop.halt()
-    sys.exit(fail_count)
+    try:
+        #print tests
+        results = []
+        start_time = time.time()
+        for test in tests:
+            result = yield test(verbose)
+            results.append(result)
+        duration = time.time() - start_time
+        print
+        print "----------------------------------------------------------------------"
+        print "Ran %s tests in %.3fs" % (len(tests), duration)
+        print
+        _fail_count = 0
+        for result in results:
+            if result['type'] != "SUCCESS":
+                _fail_count += 1
+                test = result['test']
+                print "======================================================================"
+                print "%s %s (%s)" % (result['type'],
+                                      test.__doc__ or test.__name__,
+                                      __file__)
+                print "----------------------------------------------------------------------"
+                print result['tb']
+                if result['stdout']:
+                    print "-------------------- >> begin captured stdout << ---------------------"
+                    print result['stdout']
+                    print "--------------------- >> end captured stdout << ----------------------"
+                if result['stderr']:
+                    print "-------------------- >> begin captured stderr << ---------------------"
+                    print result['stderr']
+                    print "--------------------- >> end captured stderr << ----------------------"
+                if result['log']:
+                    print "-------------------- >> begin captured log << ---------------------"
+                    print result['log']
+                    print "--------------------- >> end captured log << ----------------------"
+        if not _fail_count:
+            print "OK"
+    finally:
+        from monocle.stack import eventloop
+        eventloop.halt()
 
 
 def main(args):
@@ -212,4 +215,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    finally:
+        sys.exit(_fail_count)
