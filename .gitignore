@@ -5,3 +5,4 @@
 *.pyc
 .DS_Store
 .coverage
+monocle.egg-info
