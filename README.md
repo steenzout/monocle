@@ -1,6 +1,7 @@
 # monocle
 ## An async programming framework with a blocking look-alike syntax.
 
+[![pypi](https://img.shields.io/pypi/v/monocle.svg)](https://pypi.python.org/pypi/monocle/)
 [![Build Status](https://travis-ci.org/saucelabs/monocle.png?branch=master)](https://travis-ci.org/saucelabs/monocle)
 
 monocle straightens out event-driven code using Python's generators.
