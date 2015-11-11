@@ -7,17 +7,24 @@ branches:
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=py27-tornado
+      env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore
     - python: 2.7
-      env: TOXENV=py27-twisted
+      env: TOXENV=py27-tornado MONOCLE_STACK=tornado
     - python: 2.7
-      env: TOXENV=py27-coverage
+      env: TOXENV=py27-twisted MONOCLE_STACK=twisted
     - python: 2.6
-      env: TOXENV=py26-tornado
+      env: TOXENV=py26-asyncore MONOCLE_STACK=asyncore
     - python: 2.6
-      env: TOXENV=py26-twisted
+      env: TOXENV=py26-tornado MONOCLE_STACK=tornado
+    - python: 2.6
+      env: TOXENV=py26-twisted MONOCLE_STACK=twisted
     - python: pypy
-      env: TOXENV=pypy-tornado
+      env: TOXENV=pypy-tornado MONOCLE_STACK=tornado
+  allow_failures:
+    - python: 2.7
+      env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore
+    - python: 2.6
+      env: TOXENV=py26-asyncore MONOCLE_STACK=asyncore
 
 cache:
   - apt
@@ -32,3 +39,7 @@ install:
 
 script:
   - tox
+
+after_success:
+  - source .tox/py27-${MONOCLE_STACK}/bin/activate && py.test -q --confcutdir=.. -n 1 --junitxml=tests/junit.xml --cov-report xml --cov monocle --cov-report=html --cov-report term-missing --pep8
+
