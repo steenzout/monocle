@@ -1,25 +1,45 @@
 language: python
-python:
-  - "2.6"
-  - "2.7"
-  - "pypy"
-env:
-  - BACKEND=tornado
-  - BACKEND=twisted
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libssl-dev
-install:
-  - pip install pyOpenSSL $BACKEND --use-mirrors
-  - pip install . --use-mirrors
-  - pip install pytest
-script:
-  - python examples/basics.py $BACKEND
-  - python examples/client_server.py $BACKEND
-  - python examples/sleep.py $BACKEND
-  - python examples/tb.py $BACKEND
-  - python o_test.py -v $BACKEND tests/
+sudo: false
+branches:
+  except:
+    - gh-pages
 
 matrix:
-  exclude:
-    - python: "pypy"
+  include:
+    - python: 2.7
+      env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore
+    - python: 2.7
+      env: TOXENV=py27-tornado MONOCLE_STACK=tornado
+    - python: 2.7
+      env: TOXENV=py27-twisted MONOCLE_STACK=twisted
+    - python: 2.6
+      env: TOXENV=py26-asyncore MONOCLE_STACK=asyncore
+    - python: 2.6
+      env: TOXENV=py26-tornado MONOCLE_STACK=tornado
+    - python: 2.6
+      env: TOXENV=py26-twisted MONOCLE_STACK=twisted
+    - python: pypy
+      env: TOXENV=pypy-tornado MONOCLE_STACK=tornado
+  allow_failures:
+    - python: 2.7
+      env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore
+    - python: 2.6
+      env: TOXENV=py26-asyncore MONOCLE_STACK=asyncore
+
+cache:
+  - apt
+
+addons:
+  apt:
+    packages:
+      - libssl-dev
+
+install:
+  - pip install tox
+
+script:
+  - tox
+
+after_success:
+  - source .tox/py27-${MONOCLE_STACK}/bin/activate && py.test -q --confcutdir=.. -n 1 --junitxml=tests/junit.xml --cov-report xml --cov monocle --cov-report=html --cov-report term-missing --pep8
+
