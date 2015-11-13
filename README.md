@@ -3,6 +3,7 @@
 
 [![pypi](https://img.shields.io/pypi/v/monocle.svg)](https://pypi.python.org/pypi/monocle/)
 [![Build Status](https://travis-ci.org/saucelabs/monocle.png?branch=master)](https://travis-ci.org/saucelabs/monocle)
+[![Requirements Status](https://requires.io/github/saucelabs/monocle/requirements.png?branch=master)](https://requires.io/github/saucelabs/monocle/requirements/?branch=master)
 
 [![Project Stats](https://www.openhub.net/p/saucelabss_monocle/widgets/project_thin_badge.gif)](https://www.openhub.net/p/saucelabss_monocle/)
 
