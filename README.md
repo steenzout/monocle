@@ -3,7 +3,6 @@
 
 [![pypi](https://img.shields.io/pypi/v/monocle.svg)](https://pypi.python.org/pypi/monocle/)
 [![Build Status](https://travis-ci.org/saucelabs/monocle.png?branch=master)](https://travis-ci.org/saucelabs/monocle)
-[![Code Health](https://landscape.io/github/saucelabs/monocle/master/landscape.svg?style=flat)](https://landscape.io/github/saucelabs/monocle/master)
 
 monocle straightens out event-driven code using Python's generators.
 It aims to be portable between event-driven I/O frameworks, and
