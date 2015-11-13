@@ -4,6 +4,8 @@
 [![pypi](https://img.shields.io/pypi/v/monocle.svg)](https://pypi.python.org/pypi/monocle/)
 [![Build Status](https://travis-ci.org/saucelabs/monocle.png?branch=master)](https://travis-ci.org/saucelabs/monocle)
 
+[![Project Stats](https://www.openhub.net/p/saucelabss_monocle/widgets/project_thin_badge.gif)](https://www.openhub.net/p/saucelabss_monocle/)
+
 monocle straightens out event-driven code using Python's generators.
 It aims to be portable between event-driven I/O frameworks, and
 currently supports Twisted and Tornado.
