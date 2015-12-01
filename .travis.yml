@@ -17,7 +17,7 @@ matrix:
     - python: 2.6
       env: TOXENV=py26-tornado MONOCLE_STACK=tornado
     - python: 2.6
-      env: TOXENV=py26-twisted MONOCLE_STACK=twisted
+      env: TOXENV=py26-twisted26 MONOCLE_STACK=twisted
     - python: pypy
       env: TOXENV=pypy-tornado MONOCLE_STACK=tornado
   allow_failures:
