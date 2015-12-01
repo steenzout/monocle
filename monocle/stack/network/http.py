@@ -57,7 +57,7 @@ class HttpHeaders(collections.MutableMapping):
 
     def get_list(self, key, default=_NotSetFlag):
         key = key.lower()
-        if not key in self.keyset:
+        if key not in self.keyset:
             if default == _NotSetFlag:
                 raise KeyError(key)
             else:
@@ -81,7 +81,7 @@ class HttpHeaders(collections.MutableMapping):
 
     def __delitem__(self, key):
         key = key.lower()
-        if not key in self.keyset:
+        if key not in self.keyset:
             raise KeyError(key)
         self.keyset.remove(key)
         self.headers = [(k, v) for k, v in self.headers if k != key]
@@ -117,7 +117,7 @@ class HttpRequest(object):
             self.__class__.__name__, self.method, self.path, self.proto, self.headers)
 
     def get_basic_auth(self):
-        if not "authorization" in self.headers:
+        if 'authorization' not in self.headers:
             return None, None
         auth = self.headers["authorization"]
         try:
@@ -217,11 +217,8 @@ def read_response(conn):
                 break
     elif content_length:
         body = yield conn.read(content_length)
-    elif ((proto == 'http/1.0' and
-           not headers.get('Connection', '').lower() == 'keep-alive')
-          or
-          (proto == 'http/1.1' and
-           headers.get('Connection', '').lower() == 'close')):
+    elif ((proto == 'http/1.0' and not headers.get('Connection', '').lower() == 'keep-alive') or
+          (proto == 'http/1.1' and headers.get('Connection', '').lower() == 'close')):
         while True:
             try:
                 body += yield conn.read_some()

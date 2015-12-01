@@ -50,8 +50,8 @@ def is_eventloop_stack(stack):
     this_dir = os.path.dirname(__file__)
     for file, line, context, code in stack:
         if (file.startswith(this_dir) and
-            file.endswith("eventloop.py") and
-            context == 'run'):
+                file.endswith("eventloop.py") and
+                context == 'run'):
             return True
     return False
 
@@ -150,9 +150,11 @@ def _monocle_chain(to_gen, g, callback):
                 if duration > blocking_warn_threshold:
                     if inspect.isframe(g.gi_frame):
                         fi = inspect.getframeinfo(g.gi_frame)
-                        log.warn("oroutine '%s' blocked for %dms before %s:%s", g.__name__, duration, fi.filename, fi.lineno)
+                        log.warn(
+                            "oroutine '%s' blocked for %dms before %s:%s", g.__name__, duration, fi.filename, fi.lineno)
                     else:
-                        log.warn("oroutine '%s' blocked for %dms", g.__name__, duration)
+                        log.warn(
+                            "oroutine '%s' blocked for %dms", g.__name__, duration)
         except StopIteration:
             # "return" statement (or fell off the end of the generator)
             from_gen = Return()
@@ -174,7 +176,9 @@ def _monocle_chain(to_gen, g, callback):
                 from_gen.addCallbacks(cb, lambda f: cb(_add_twisted_tb(f)))
                 from_gen = cb
             else:
-                e = InvalidYieldException("Unexpected value '%s' of type '%s' yielded from o-routine '%s'.  O-routines can only yield Callback and Return types." % (from_gen, type(from_gen), g))
+                e = InvalidYieldException(
+                    "Unexpected value '%s' of type '%s' yielded from o-routine '%s'.  "
+                    "O-routines can only yield Callback and Return types." % (from_gen, type(from_gen), g))
                 return _monocle_chain(e, g, callback)
 
         if not hasattr(from_gen, 'result'):

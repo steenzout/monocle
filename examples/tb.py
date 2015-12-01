@@ -2,6 +2,7 @@ import sys
 
 import monocle
 monocle.init(sys.argv[1])
+
 from monocle import _o, launch
 from monocle.util import sleep
 from monocle.stack import eventloop
@@ -13,37 +14,35 @@ def req():
     yield client.connect("localhost", 12344, timeout=1)
 
 def die():
-  raise Exception("boom")
+    raise Exception("boom")
 
 @_o
 def fifth():
-  die()
+    die()
 
 def fourth():
-  return fifth()
+    return fifth()
 
 @_o
 def third():
-  yield fourth()
+    yield fourth()
 
 def second():
-  return third()
+    return third()
 
 @_o
 def first():
-  yield second()
+    yield second()
 
 @_o
 def first_evlp():
-  try:
-    yield sleep(1)
-    yield req()
-    yield launch(second)
-  finally:
-    eventloop.halt()
+    try:
+        yield sleep(1)
+        yield req()
+        yield launch(second)
+    finally:
+        eventloop.halt()
 
 launch(first)
 eventloop.queue_task(0, first_evlp)
 eventloop.run()
-
-
