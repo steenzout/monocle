@@ -42,4 +42,5 @@ script:
 
 after_success:
   - source .tox/py${PYTHON_VERSION}-${MONOCLE_STACK}/bin/activate && py.test -q --confcutdir=.. -n 1 --junitxml=tests/junit.xml --cov-report xml --cov monocle --cov-report=html --cov-report term-missing --pep8
+  - source .tox/py27-${MONOCLE_STACK}/bin/activate && pylint monocle
 
