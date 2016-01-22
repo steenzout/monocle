@@ -411,18 +411,31 @@ class HttpRouter(object):
     def patch(self, pattern):
         return self.mk_decorator('PATCH', pattern)
 
-    @_o
-    def handle_request(self, req):
-        before = time.time()
-        resp = None
+    def route_match(self, req):
         for pattern, handler in self.routes[req.method]:
             match, kwargs = self.path_matches(urllib2.unquote(req.path),
                                               pattern)
             if match:
-                resp = yield handler(req, **kwargs)
-                break
+                return handler, kwargs
+        return None, None
+
+    @_o
+    def request_handler_wrapper(self, req, handler, **kwargs):
+        resp = yield handler(req, **kwargs)
+        yield Return(resp)
+
+    @_o
+    def handle_request(self, req):
+        before = time.time()
+        resp = None
+
+        handler, kwargs = self.route_match(req)
+        if handler:
+            resp = yield self.request_handler_wrapper(req, handler, **kwargs)
+
         if self.handler and not resp:
-            resp = yield self.handler(req)
+            resp = yield self.request_handler_wrapper(req, self.handler)
+
         if not resp:
             resp = (404, {}, "")
         after = time.time()
