@@ -50,8 +50,8 @@ def is_eventloop_stack(stack):
     this_dir = os.path.dirname(__file__)
     for file, line, context, code in stack:
         if (file.startswith(this_dir) and
-                file.endswith("eventloop.py") and
-                context == 'run'):
+            file.endswith("eventloop.py") and
+            context == 'run'):
             return True
     return False
 

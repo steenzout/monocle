@@ -217,8 +217,11 @@ def read_response(conn):
                 break
     elif content_length:
         body = yield conn.read(content_length)
-    elif ((proto == 'http/1.0' and not headers.get('Connection', '').lower() == 'keep-alive') or
-          (proto == 'http/1.1' and headers.get('Connection', '').lower() == 'close')):
+    elif ((proto == 'http/1.0' and
+           not headers.get('Connection', '').lower() == 'keep-alive')
+          or
+          (proto == 'http/1.1' and
+           headers.get('Connection', '').lower() == 'close')):
         while True:
             try:
                 body += yield conn.read_some()
