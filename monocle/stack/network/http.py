@@ -287,9 +287,15 @@ class HttpClient(object):
     def request(self, url, headers=None, method='GET', body=None):
         parts = urlparse.urlsplit(url)
         scheme = parts.scheme or self.scheme
-        if parts.scheme and parts.scheme not in ['http', 'https']:
+        if scheme not in ['http', 'https']:
             raise HttpException('unsupported url scheme %s' % parts.scheme)
-        host = parts.hostname or self.host
+
+        host = parts.netloc
+        if not host:
+            host = self.host
+            if self.port != self.DEFAULT_PORTS[scheme]:
+                host += ":%s" % self.port
+
         path = parts.path
         if parts.query:
             path += '?' + parts.query
@@ -329,8 +335,10 @@ class HttpClient(object):
             self.client.close()
             yield self.connect(host, port, scheme=parts.scheme)
 
-        result = yield self.request(url, headers, method, body)
-        self.close()
+        try:
+            result = yield self.request(url, headers, method, body)
+        finally:
+            self.close()
         yield Return(result)
 
 
