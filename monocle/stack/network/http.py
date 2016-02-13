@@ -387,15 +387,11 @@ class HttpRouter(object):
             pattern = re.compile("^" + pattern + "$")
 
         def decorator(f):
-            @_o
-            @wraps(f)
-            def replacement(req, **kwargs):
-                resp = yield _o(f)(req, **kwargs)
-                yield Return(resp)
-            self.routes[method].append((pattern, replacement))
+            handler = _o(f)
+            self.routes[method].append((pattern, handler))
             if add_head:
-                self.routes['HEAD'].append((pattern, replacement))
-            return replacement
+                self.routes['HEAD'].append((pattern, handler))
+            return handler
         return decorator
 
     def get(self, pattern, add_head=True):
