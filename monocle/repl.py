@@ -71,7 +71,7 @@ def main():
                     continue
                 eval(_c, gs, ls)
             except SyntaxError, e:
-                if not "'yield' outside function" in str(e):
+                if "'yield' outside function" not in str(e):
                     raise
 
                 # it's a yield!

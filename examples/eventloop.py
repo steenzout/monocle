@@ -8,11 +8,11 @@ from monocle.stack import eventloop
 from monocle.util import sleep
 
 @_o
-def foo(x, z=1):
+def yielding_oroutine(x, z=1):
     yield sleep(1)
     print x
 
-def bar(x, z=1):
+def nonyielding_oroutine(x, z=1):
     print x
 
 @_o
@@ -20,7 +20,7 @@ def fail():
     raise Exception("whoo")
     yield sleep(1)
 
-eventloop.queue_task(0, foo, x="oroutine worked")
-eventloop.queue_task(0, bar, x="function worked")
+eventloop.queue_task(0, yielding_oroutine, x="oroutine worked")
+eventloop.queue_task(0, nonyielding_oroutine, x="function worked")
 eventloop.queue_task(0, fail)
 eventloop.run()

@@ -5,7 +5,7 @@ from monocle import launch
 
 # prefer fast reactors
 # FIXME: this should optionally refuse to use slow ones
-if not "twisted.internet.reactor" in sys.modules:
+if 'twisted.internet.reactor' not in sys.modules:
     try:
         from twisted.internet import epollreactor
         epollreactor.install()

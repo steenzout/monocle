@@ -51,12 +51,12 @@ class SplitChannel(object):
 
     @_o
     def _receiver(self):
-       while True:
-           try:
-               value = yield self.chan.recv()
-               yield self.channels[value['subchan']].send(value)
-           except ConnectionLost:
-               break
+        while True:
+            try:
+                value = yield self.chan.recv()
+                yield self.channels[value['subchan']].send(value)
+            except ConnectionLost:
+                break
 
     @_o
     def send(self, subchan, value):
