@@ -1,6 +1,9 @@
-# Sort of like Twisted's Deferred, but simplified.  We don't do
-# callback chaining, since oroutines replace that mechanism.
 class Callback(object):
+    """
+    Sort of like Twisted's Deferred, but simplified.  We don't do
+    callback chaining, since oroutines replace that mechanism.
+    """
+
     def __init__(self):
         self._handlers = []
 

@@ -4,6 +4,7 @@
 
 from collections import deque
 from callback import Callback
+
 from monocle.stack.eventloop import queue_task
 from monocle import _o, Return
 
@@ -72,8 +73,6 @@ def first_of(*a):
     yield Return([(True, r) if x == i else None for i in xrange(len(a))])
 
 
-waits = {}
-
 @_o
 def fire(name, value):
     if name in waits:
@@ -81,8 +80,11 @@ def fire(name, value):
         waits.pop(name)
         cb(value)
 
+
 @_o
 def wait(name):
     waits.setdefault(name, Callback())
     r = yield waits[name]
     yield Return(r)
+
+waits = {}

@@ -3,35 +3,37 @@ from monocle import _o, Return
 from monocle.callback import Callback, defer
 from monocle.stack import eventloop as evlp
 
+
 class ConnectionLost(Exception):
     pass
 
-# Connection takes a stack_conn, which should have this interface:
-#
-# def write(data):
-#   writes the data
-#
-# read_cb: callback which is called when a read completes
-# connect_cb: callback which is called when the connection completes
-#
-# def resume():
-#   resumes reading
-#
-# def reading():
-#   returns a boolean indicating the current reading state
-#
-# def closed():
-#   returns a boolean indicating the current closed state
-#
-# def disconnect():
-#   closes the connection
-#
-# if the read/read_until implementations here are used:
-#
-# buffer: string buffer which grows before read_cb is called
-
 
 class Connection(object):
+    """
+    Connection takes a stack_conn, which should have this interface:
+
+    def write(data):
+        writes the data
+
+    read_cb: callback which is called when a read completes
+    connect_cb: callback which is called when the connection completes
+
+    def resume():
+        resumes reading
+
+    def reading():
+        returns a boolean indicating the current reading state
+
+    def closed():
+        returns a boolean indicating the current closed state
+
+    def disconnect():
+        closes the connection
+
+    if the read/read_until implementations here are used:
+
+    buffer: string buffer which grows before read_cb is called
+    """
     def __init__(self, stack_conn=None):
         self._stack_conn = stack_conn
         self.writing = False

@@ -13,7 +13,8 @@ from monocle.stack.network.http import HttpHeaders, HttpRequest, HttpClient, Htt
 from monocle.tornado_stack.network import Service
 
 
-class HttpException(Exception): pass
+class HttpException(Exception):
+    pass
 
 
 class HttpClient(HttpClient):

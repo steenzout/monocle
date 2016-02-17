@@ -16,6 +16,7 @@ def test_send_recv():
         r = yield ch.recv()
         assert r == 'ok%s' % x
 
+
 @_o
 def sendxs(ch, xs):
     print "in sendxs"

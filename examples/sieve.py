@@ -50,34 +50,43 @@
 # -sah
 
 import sys
-
 import monocle
+
 from monocle import _o
 monocle.init(sys.argv[1])
 
 from monocle.stack import eventloop
 from monocle.experimental import Channel
 
-# Send the sequence 2, 3, 4, ... to channel 'ch'.
+
 @_o
 def generate(ch):
+    """
+    Send the sequence 2, 3, 4, ... to channel 'ch'.
+    """
     i = 2
     while True:
         yield ch.send(i)  # Send 'i' to channel 'ch'.
         i += 1
 
-# Copy the values from channel 'inc' to channel 'outc',
-# removing those divisible by 'prime'.
+
 @_o
 def filter(inc, outc, prime):
+    """
+    Copy the values from channel 'inc' to channel 'outc',
+    removing those divisible by 'prime'.
+    """
     while True:
         i = yield inc.recv()  # Receive value of new variable 'i' from 'in'.
         if i % prime != 0:
             yield outc.send(i)  # Send 'i' to channel 'outc'.
 
-# The prime sieve: Daisy-chain filter processes together.
+
 @_o
 def main():
+    """
+    The prime sieve: Daisy-chain filter processes together.
+    """
     ch = Channel()  # Create a new channel.
     monocle.launch(generate, ch)  # Start generate() as an o-routine.
     while True:
@@ -86,6 +95,7 @@ def main():
         ch1 = Channel()
         filter(ch, ch1, prime)
         ch = ch1
+
 
 monocle.launch(main)
 eventloop.run()

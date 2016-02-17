@@ -17,7 +17,9 @@ from twisted.web import server, resource
 
 log = logging.getLogger("monocle.twisted_stack.network.http")
 
-class HttpException(Exception): pass
+
+class HttpException(Exception):
+    pass
 
 
 class _HttpServerResource(resource.Resource):

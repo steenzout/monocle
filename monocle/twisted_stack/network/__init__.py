@@ -13,11 +13,13 @@ from monocle.stack.network import Connection, ConnectionLost
 from monocle.util import monkeypatch
 from twisted.protocols.tls import TLSMemoryBIOProtocol, WantReadError
 
+
 # monkeypatch TLSMemoryBIOProtocol to resume reading when necessary for writes
 @monkeypatch(TLSMemoryBIOProtocol)
 def __init__(orig_method, self, *a, **k):
     orig_method(self, *a, **k)
     self._was_paused = False
+
 
 @monkeypatch(TLSMemoryBIOProtocol)
 def _write(orig_method, self, bytes):
@@ -27,6 +29,7 @@ def _write(orig_method, self, bytes):
         if self.transport.producer._producerPaused:
             self._was_paused = True
             self.transport.resumeProducing()
+
 
 @monkeypatch(TLSMemoryBIOProtocol)
 def dataReceived(orig_method, self, bytes):

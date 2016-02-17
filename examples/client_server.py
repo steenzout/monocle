@@ -1,12 +1,13 @@
 import sys
 import time
-
 import monocle
+
 from monocle import _o
 monocle.init(sys.argv[1])
 
 from monocle.stack import eventloop
 from monocle.stack.network import add_service, Service, Client, ConnectionLost
+
 
 @_o
 def handle_echo(conn):
@@ -16,6 +17,7 @@ def handle_echo(conn):
         except ConnectionLost:
             break
         yield conn.write("you said: %s\r\n" % message.strip())
+
 
 @_o
 def do_echos():
@@ -32,6 +34,7 @@ def do_echos():
     finally:
         client.close()
         eventloop.halt()
+
 
 add_service(Service(handle_echo, port=8000))
 monocle.launch(do_echos)

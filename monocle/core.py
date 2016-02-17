@@ -15,15 +15,19 @@ try:
     from twisted.python.failure import Failure as TwistedFailure
     from twisted.internet.defer import Deferred as TwistedDeferred
 except ImportError:
-    class TwistedFailure: pass
-    class TwistedDeferred: pass
+    class TwistedFailure:
+        pass
+
+    class TwistedDeferred:
+        pass
 
 logging.basicConfig(stream=sys.stderr,
                     format="%(message)s")
 log = logging.getLogger("monocle")
 
-blocking_warn_threshold = 500 # ms
+blocking_warn_threshold = 500  # ms
 tracebacks_elide_internals = True
+
 
 class Return(object):
     def __init__(self, *args):
@@ -79,8 +83,8 @@ def format_tb(e, elide_internals=tracebacks_elide_internals):
     for i, (tb, stack) in enumerate(reversed(e._monocle['tracebacks'])):
         lines = tb.split('\n')
 
-        first = lines[0] # "Traceback (most recent call last)"
-        last = lines[-2] # Line describing the exception
+        first = lines[0]  # "Traceback (most recent call last)"
+        last = lines[-2]  # Line describing the exception
 
         stack_lines = []
         if not is_eventloop_stack(stack):
