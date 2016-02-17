@@ -83,6 +83,7 @@ class SubChannel(object):
         value = yield self.split_chan.recv(self.name)
         yield Return(value)
 
+
 def make_subchannels(chan, subchans):
     splitchan = SplitChannel(chan, subchans)
     return [SubChannel(splitchan, name) for name in subchans]

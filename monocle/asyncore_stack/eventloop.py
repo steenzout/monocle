@@ -4,6 +4,7 @@ import functools
 
 from monocle import launch
 
+
 class EventLoop(object):
     def __init__(self):
         self._running = True

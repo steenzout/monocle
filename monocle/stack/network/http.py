@@ -218,8 +218,7 @@ def read_response(conn):
     elif content_length:
         body = yield conn.read(content_length)
     elif ((proto == 'http/1.0' and
-           not headers.get('Connection', '').lower() == 'keep-alive')
-          or
+           not headers.get('Connection', '').lower() == 'keep-alive') or
           (proto == 'http/1.1' and
            headers.get('Connection', '').lower() == 'close')):
         while True:
@@ -458,6 +457,7 @@ class HttpRouter(object):
 
 
 import monocle
+
 if monocle._stack_name == 'twisted':
     from monocle.twisted_stack.network.http import *
 elif monocle._stack_name == 'tornado':

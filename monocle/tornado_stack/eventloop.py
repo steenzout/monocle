@@ -23,6 +23,7 @@ class EventLoop(object):
     def queue_task(self, delay, callable, *args, **kw):
         def task():
             return launch(callable, *args, **kw)
+
         def queue():
             now = time.time()
             timeout = self._tornado_ioloop.add_timeout(now + delay, task)

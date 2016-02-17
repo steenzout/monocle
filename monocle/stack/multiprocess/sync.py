@@ -38,7 +38,7 @@ def log_receive(chan):
             h.setFormatter(h.old_formatter)
 
 
-### using sockets ###
+# using sockets
 class SyncSockChannel(object):
     def __init__(self, sock):
         self.sock = sock
@@ -196,7 +196,7 @@ def launch_proc_with_sockets(target, port, *args, **kwargs):
     yield Return(p, main_chan)
 
 
-### using pipes ###
+# using pipes
 class PipeHandler(logging.Handler):
     def __init__(self, pipe):
         logging.Handler.__init__(self)

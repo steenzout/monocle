@@ -66,9 +66,11 @@ class ConnectionTestCase(object):
         data = 'ok'
         self.buffer = 'o'
         self.conn.timeout = 0.2
+
         def populate():
             self.buffer += 'k'
             self.stack_conn.read_cb(None)
+
         eventloop.queue_task(0.1, populate)
         r = yield self.conn.read(2)
         assert r == data
@@ -99,9 +101,11 @@ class ConnectionTestCase(object):
     def test_read_some_delay(self):
         data = 'ok'
         self.conn.timeout = 0.2
+
         def populate():
             self.buffer = data
             self.stack_conn.read_cb(None)
+
         eventloop.queue_task(0.1, populate)
         r = yield self.conn.read_some()
         assert r == data

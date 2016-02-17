@@ -7,13 +7,17 @@ import traceback
 from threading import Thread
 
 import monocle
+
 from monocle import _o, Return
 monocle.init(sys.argv[1])
+
 from monocle.stack import eventloop
 from monocle.callback import Callback
 
+
 # it's annoying to ever see these warnings at the repl, so tolerate a lot
 monocle.core.blocking_warn_threshold = 10000
+
 
 class HistoryConsole(code.InteractiveConsole):
     def __init__(self, locals=None, filename="<console>",
@@ -33,6 +37,7 @@ class HistoryConsole(code.InteractiveConsole):
     def save_history(self, histfile):
         readline.write_history_file(histfile)
 
+
 @_o
 def main():
     print "Monocle", monocle.VERSION, "/", "Python", sys.version
@@ -48,6 +53,7 @@ def main():
                 source += "\n"
 
             cb = Callback()
+
             def wait_for_input():
                 try:
                     prompt = ">>> "

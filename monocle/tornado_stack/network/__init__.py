@@ -18,11 +18,13 @@ from monocle.stack.network import Connection
 from monocle.tornado_stack.eventloop import evlp
 from monocle.util import monkeypatch
 
+
 # monkeypatch IOStream to provide a reactive read
 @monkeypatch(IOStream)
 def __init__(orig_method, self, *a, **k):
     orig_method(self, *a, **k)
     self._read_some = None
+
 
 @monkeypatch(IOStream)
 def _read_from_buffer(orig_method, self, *a, **k):
@@ -35,6 +37,7 @@ def _read_from_buffer(orig_method, self, *a, **k):
             return True
     else:
         return orig_method(self, *a, **k)
+
 
 @monkeypatch(IOStream)
 def read_some(orig_method, self, callback):

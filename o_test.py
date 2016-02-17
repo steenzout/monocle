@@ -160,6 +160,7 @@ def main(args):
 
     class State(object):
         debug = False
+
         def trace(self, msg):
             if self.debug:
                 print msg
@@ -169,6 +170,7 @@ def main(args):
 
     class Session(object):
         config = Config()
+
         def isinitpath(self, fn):
             return False
 
