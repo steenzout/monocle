@@ -17,8 +17,6 @@ matrix:
   allow_failures:
     - python: 2.7
       env: TOXENV=asyncore MONOCLE_STACK=asyncore
-    - python: 2.7
-      env: TOXENV=coverage MONOCLE_STACK=twisted
 
 cache:
   - apt
