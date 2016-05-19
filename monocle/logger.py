@@ -1,3 +1,4 @@
+"""Logger for monocle."""
 # -*- coding: utf-8 -*-
 
 import sys
@@ -8,13 +9,12 @@ from monocle.core import format_tb
 
 
 class Adapter(logging.LoggerAdapter):
-    """
-    A monocle-friendly logger.
-    """
+
+    """A monocle-friendly logger."""
 
     def __init__(self, logger):
         """
-        Initializes a LoggerAdapter instance.
+        Initialize a LoggerAdapter instance.
 
         :param logger: the logger instance.
         """
@@ -22,12 +22,16 @@ class Adapter(logging.LoggerAdapter):
 
     def exception(self, msg, *args, **kwargs):
         """
-        Delegate an exception call to the underlying logger, after adding
-        contextual information from this adapter instance.
-        """
-        e = sys.exc_info()[1]
+        Handle an exception call.
 
-        if hasattr(e, '_monocle'):
-            self.logger.error('%s\n%s', msg, format_tb(e))
+        In case of o-routines,
+        this function will write to this adapter's logger
+        the exception message with its stack trace.
+        Otherwise, it will delegate the log message processing to the underlying logger.
+        """
+        ex = sys.exc_info()[1]
+
+        if hasattr(ex, '_monocle'):
+            self.logger.error('%s\n%s', msg, format_tb(ex))
         else:
             super(Adapter, self).exception(msg, *args, **kwargs)
