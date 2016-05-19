@@ -9,8 +9,6 @@ matrix:
     - python: 2.7
       env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore
     - python: 2.7
-      env: TOXENV=py27-coverage MONOCLE_STACK=twisted
-    - python: 2.7
       env: TOXENV=py27-tornado MONOCLE_STACK=tornado
     - python: 2.7
       env: TOXENV=py27-twisted MONOCLE_STACK=twisted
@@ -31,3 +29,7 @@ install:
 
 script:
   - tox
+
+after_success:
+  - tox -e coveralls
+  - tox -e lint
