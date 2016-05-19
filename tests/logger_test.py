@@ -1,0 +1,84 @@
+# -*- coding: utf-8 -*-
+
+import logging
+import monocle
+import unittest
+
+from monocle import _o
+from monocle.logger import Adapter
+from monocle.stack import eventloop
+
+from testfixtures import LogCapture
+
+
+class LoggerAdapterTestCase(unittest.TestCase):
+    """
+    Tests for the logging.MonocleLogger class.
+    """
+
+    def setUp(self):
+        """
+        Setup log capture and monocle logger adapter instance.
+        """
+        self.l = LogCapture()
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+        self.logger = Adapter(logger)
+
+    def tearDown(self):
+        """
+        Tear down log capture.
+        """
+        self.l.uninstall()
+
+    def test_exception_outside_o(self):
+        """
+        Test behavior of monocle.logger.LoggerAdapter.exception() function when
+        used outside of an o-routine.
+        """
+
+        try:
+            raise Exception('Test')
+        except Exception as e:
+            self.logger.exception(e)
+
+        self.l.check(('root', 'ERROR', 'Test'))
+
+    def test_exception_inside_o(self):
+        """
+        Test behavior of monocle.logger.LoggerAdapter.exception() function when
+        used inside of an o-routine.
+        """
+        @_o
+        def t():
+            @_o
+            def e():
+                raise Exception('Test')
+
+            try:
+                _ = yield e()
+            except BaseException as e:
+                self.logger.exception(e)
+                eventloop.halt()
+                raise e
+
+        monocle.launch(t)
+        eventloop.run()
+
+        stack_trace = '\nTraceback (most recent call last):\n  File '
+        self.assertEqual(2, len([x for x in self.l.actual()]))
+
+        found_root = False
+        found_monocle = False
+        for name, level, message in self.l.actual():
+            self.assertEqual('ERROR', level)
+            if name == 'root':
+                self.assertTrue(message.startswith('%s%s' % ('Test', stack_trace)))
+                found_root = True
+            elif name == 'monocle':
+                # monocle logger does not log the exception message
+                self.assertTrue(message.startswith('%s%s' % ('', stack_trace)))
+                found_monocle = True
+
+        self.assertTrue(found_root)
+        self.assertTrue(found_monocle)
