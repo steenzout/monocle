@@ -7,16 +7,16 @@ branches:
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=asyncore MONOCLE_STACK=asyncore
+      env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore
     - python: 2.7
-      env: TOXENV=coverage MONOCLE_STACK=twisted
+      env: TOXENV=py27-coverage MONOCLE_STACK=twisted
     - python: 2.7
-      env: TOXENV=tornado MONOCLE_STACK=tornado
+      env: TOXENV=py27-tornado MONOCLE_STACK=tornado
     - python: 2.7
-      env: TOXENV=twisted MONOCLE_STACK=twisted
+      env: TOXENV=py27-twisted MONOCLE_STACK=twisted
   allow_failures:
     - python: 2.7
-      env: TOXENV=asyncore MONOCLE_STACK=asyncore
+      env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore
 
 cache:
   - apt
