@@ -74,9 +74,10 @@ class AdapterTestCase(unittest.TestCase):
             try:
                 _ = yield e()
             except BaseException as e:
-                self.logger.exception(e)
-                eventloop.halt()
+                self.logger.exception('%s %s', 'unexpected error', e)
                 raise e
+            finally:
+                eventloop.halt()
 
         monocle.launch(t)
         eventloop.run()
@@ -89,7 +90,7 @@ class AdapterTestCase(unittest.TestCase):
         for name, level, message in self.l.actual():
             self.assertEqual('ERROR', level)
             if name == 'root':
-                self.assertTrue(message.startswith('%s%s' % ('Test', stack_trace)))
+                self.assertTrue(message.startswith('%s%s' % ('unexpected error Test', stack_trace)))
                 found_root = True
             elif name == 'monocle':
                 # monocle logger does not log the exception message

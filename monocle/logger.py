@@ -44,6 +44,7 @@ class Adapter(logging.LoggerAdapter):
         ex = sys.exc_info()[1]
 
         if hasattr(ex, '_monocle'):
-            self.logger.error('%s\n%s', msg, format_tb(ex))
+            args = args + (format_tb(ex),)
+            self.logger.error('%s\n%%s' % msg, *args, **kwargs)
         else:
             super(Adapter, self).exception(msg, *args, **kwargs)
