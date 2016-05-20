@@ -2,10 +2,10 @@
 ## An async programming framework with a blocking look-alike syntax.
 
 [![pypi](https://img.shields.io/pypi/v/monocle.svg)](https://pypi.python.org/pypi/monocle/)
-[![Build Status](https://travis-ci.org/steenzout/monocle.png?branch=steenzout)](https://travis-ci.org/steenzout/monocle)
+[![Build Status](https://travis-ci.org/steenzout/monocle.svg?branch=steenzout)](https://travis-ci.org/steenzout/monocle)
 [![Code Health](https://landscape.io/github/steenzout/monocle/steenzout/landscape.svg?style=flat)](https://landscape.io/github/steenzout/monocle/steenzout)
 [![Coverage Status](https://coveralls.io/repos/github/steenzout/monocle/badge.svg?branch=steenzout)](https://coveralls.io/github/steenzout/monocle?branch=steenzout)
-[![Requirements Status](https://requires.io/github/steenzout/monocle/requirements.png?branch=steenzout)](https://requires.io/github/steenzout/monocle/requirements/?branch=steenzout)
+[![Requirements Status](https://requires.io/github/steenzout/monocle/requirements.svg?branch=steenzout)](https://requires.io/github/steenzout/monocle/requirements/?branch=steenzout)
 
 [![Project Stats](https://www.openhub.net/p/saucelabss_monocle/widgets/project_thin_badge.gif)](https://www.openhub.net/p/saucelabss_monocle/)
 
