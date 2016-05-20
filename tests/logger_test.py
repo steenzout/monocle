@@ -5,16 +5,32 @@ import monocle
 import unittest
 
 from monocle import _o
-from monocle.logger import Adapter
+from monocle.logger import get, Adapter
 from monocle.stack import eventloop
 
 from testfixtures import LogCapture
 
 
-class LoggerAdapterTestCase(unittest.TestCase):
-    """
-    Tests for the logging.MonocleLogger class.
-    """
+class GetTestCase(unittest.TestCase):
+
+    """Tests for the monocle.logger.get() function."""
+
+    def test_get(self):
+        """Test get without logger name."""
+        adapter = get()
+        self.assertIsNotNone(adapter)
+        self.assertEqual('root', adapter.logger.name)
+
+    def test_get_with_name(self):
+        """Test get with logger name."""
+        adapter = get('logger_test')
+        self.assertIsNotNone(adapter)
+        self.assertEqual('logger_test', adapter.logger.name)
+
+
+class AdapterTestCase(unittest.TestCase):
+
+    """Tests for the monocle.logger.Adapter class."""
 
     def setUp(self):
         """

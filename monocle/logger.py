@@ -8,6 +8,18 @@ import logging
 from monocle.core import format_tb
 
 
+def get(name=None):
+    """
+    Return a monocle logger adapter with the specified name, creating it if necessary.
+
+    If no name is specified, return a root logger adapter.
+
+    :param name: logger name.
+    :return: monocle logger adapter.
+    """
+    return Adapter(logging.getLogger(name))
+
+
 class Adapter(logging.LoggerAdapter):
 
     """A monocle-friendly logger."""
