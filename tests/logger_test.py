@@ -5,16 +5,32 @@ import monocle
 import unittest
 
 from monocle import _o
-from monocle.logger import Adapter
+from monocle.logger import get, Adapter
 from monocle.stack import eventloop
 
 from testfixtures import LogCapture
 
 
-class LoggerAdapterTestCase(unittest.TestCase):
-    """
-    Tests for the logging.MonocleLogger class.
-    """
+class GetTestCase(unittest.TestCase):
+
+    """Tests for the monocle.logger.get() function."""
+
+    def test_get(self):
+        """Test get without logger name."""
+        adapter = get()
+        self.assertIsNotNone(adapter)
+        self.assertEqual('root', adapter.logger.name)
+
+    def test_get_with_name(self):
+        """Test get with logger name."""
+        adapter = get('logger_test')
+        self.assertIsNotNone(adapter)
+        self.assertEqual('logger_test', adapter.logger.name)
+
+
+class AdapterTestCase(unittest.TestCase):
+
+    """Tests for the monocle.logger.Adapter class."""
 
     def setUp(self):
         """
@@ -58,9 +74,10 @@ class LoggerAdapterTestCase(unittest.TestCase):
             try:
                 _ = yield e()
             except BaseException as e:
-                self.logger.exception(e)
-                eventloop.halt()
+                self.logger.exception('%s %s', 'unexpected error', e)
                 raise e
+            finally:
+                eventloop.halt()
 
         monocle.launch(t)
         eventloop.run()
@@ -73,7 +90,7 @@ class LoggerAdapterTestCase(unittest.TestCase):
         for name, level, message in self.l.actual():
             self.assertEqual('ERROR', level)
             if name == 'root':
-                self.assertTrue(message.startswith('%s%s' % ('Test', stack_trace)))
+                self.assertTrue(message.startswith('%s%s' % ('unexpected error Test', stack_trace)))
                 found_root = True
             elif name == 'monocle':
                 # monocle logger does not log the exception message
