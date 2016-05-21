@@ -10,7 +10,7 @@ import logging
 from monocle.core import format_tb
 
 
-def get(name=None):
+def getLogger(name=None):
     """
     Return a monocle logger adapter with the specified name, creating it if necessary.
 

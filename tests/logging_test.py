@@ -5,7 +5,7 @@ import monocle
 import unittest
 
 from monocle import _o
-from monocle.logging import get, Adapter
+from monocle.logging import getLogger, Adapter
 from monocle.stack import eventloop
 
 from testfixtures import LogCapture
@@ -17,13 +17,13 @@ class GetTestCase(unittest.TestCase):
 
     def test_get(self):
         """Test get without logger name."""
-        adapter = get()
+        adapter = getLogger()
         self.assertIsNotNone(adapter)
         self.assertEqual('root', adapter.logger.name)
 
     def test_get_with_name(self):
         """Test get with logger name."""
-        adapter = get('logger_test')
+        adapter = getLogger('logger_test')
         self.assertIsNotNone(adapter)
         self.assertEqual('logger_test', adapter.logger.name)
 
