@@ -38,10 +38,9 @@ class Adapter(logging.LoggerAdapter):
         """
         Handle an exception call.
 
-        In case of o-routines,
-        this function will write to this adapter's logger
-        the exception message with its stack trace.
-        Otherwise, it will delegate the log message processing to the underlying logger.
+        Exceptions thrown from o-routines contain extra metadata to allow us to
+        reconstruct a traceback that follows the stack through
+        the round trips to the event loop that happen at every yield in an o-routine.
         """
         ex = sys.exc_info()[1]
 
