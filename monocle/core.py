@@ -11,7 +11,7 @@ import inspect
 import os.path
 import functools
 
-from callback import Callback, defer
+from monocle.callback import Callback, defer
 
 try:
     from twisted.python.failure import Failure as TwistedFailure
