@@ -5,7 +5,7 @@ import monocle
 import unittest
 
 from monocle import _o
-from monocle.logger import get, Adapter
+from monocle.logging import get, Adapter
 from monocle.stack import eventloop
 
 from testfixtures import LogCapture

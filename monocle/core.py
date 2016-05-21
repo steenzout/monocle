@@ -1,5 +1,7 @@
 # This code is based heavily on inlineCallbacks from Twisted 10.0, see LICENSE.
 
+from __future__ import absolute_import
+
 import sys
 import types
 import logging
