@@ -8,9 +8,7 @@ monocle straightens out event-driven code using Python's generators.
 It aims to be portable between event-driven I/O frameworks, and
 currently supports Twisted and Tornado.
 
-It's for Python 2.5 and up; the syntax it uses isn't supported
-in older versions of Python.  (Versions before 2.7 require the
-[ordereddict](http://pypi.python.org/pypi/ordereddict/) module.)
+It's for Python 2.7.
 
 ## A Simple Example
 
