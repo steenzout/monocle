@@ -12,19 +12,11 @@ matrix:
       env: TOXENV=py27-tornado MONOCLE_STACK=tornado PYTHON_VERSION=27
     - python: 2.7
       env: TOXENV=py27-twisted MONOCLE_STACK=twisted PYTHON_VERSION=27
-    - python: 2.6
-      env: TOXENV=py26-asyncore MONOCLE_STACK=asyncore PYTHON_VERSION=26
-    - python: 2.6
-      env: TOXENV=py26-tornado MONOCLE_STACK=tornado PYTHON_VERSION=26
-    - python: 2.6
-      env: TOXENV=py26-twisted26 MONOCLE_STACK=twisted PYTHON_VERSION=26
     - python: pypy
       env: TOXENV=pypy-tornado MONOCLE_STACK=tornado PYTHON_VERSION=26
   allow_failures:
     - python: 2.7
       env: TOXENV=py27-asyncore MONOCLE_STACK=asyncore PYTHON_VERSION=27
-    - python: 2.6
-      env: TOXENV=py26-asyncore MONOCLE_STACK=asyncore PYTHON_VERSION=26
 
 cache:
   - apt
