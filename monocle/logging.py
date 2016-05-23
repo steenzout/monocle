@@ -19,20 +19,12 @@ def getLogger(name=None):
     :param name: logger name.
     :return: monocle logger adapter.
     """
-    return Adapter(logging.getLogger(name))
+    return Adapter(logging.getLogger(name), None)
 
 
 class Adapter(logging.LoggerAdapter):
 
     """A monocle-friendly logger."""
-
-    def __init__(self, logger):
-        """
-        Initialize a LoggerAdapter instance.
-
-        :param logger: the logger instance.
-        """
-        super(Adapter, self).__init__(logger, None)
 
     def exception(self, msg, *args, **kwargs):
         """

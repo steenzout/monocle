@@ -39,7 +39,7 @@ class AdapterTestCase(unittest.TestCase):
         self.l = LogCapture()
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
-        self.logger = Adapter(logger)
+        self.logger = Adapter(logger, None)
 
     def tearDown(self):
         """
